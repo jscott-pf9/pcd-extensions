@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "name": "Platform9 PCD extensions",
-  "updated": "2026-10-21T17:04:28Z",
+  "updated": "2026-10-21T20:15:05Z",
   "extensions": [
     {
       "id": "hello-world",
@@ -25,8 +25,14 @@
       "publisher": "Platform9",
       "category": "networking",
       "tagline": "Per-tenant gateways with firewall, NAT and VPN.",
-      "latest": "0.6.1",
+      "latest": "0.7.0",
       "versions": [
+        {
+          "version": "0.7.0",
+          "manifest": "manifests/pcd-netdirector/0.7.0.json",
+          "sha256": "3922a1c7a016325e53c33153923313f11a87c34785f7e319a93defb23bf6fab7",
+          "published": "2026-10-21"
+        },
         {
           "version": "0.6.1",
           "manifest": "manifests/pcd-netdirector/0.6.1.json",
