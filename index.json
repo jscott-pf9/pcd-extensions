@@ -1,0 +1,71 @@
+{
+  "schema_version": "1",
+  "name": "Platform9 PCD extensions",
+  "updated": "2026-10-21T17:04:28Z",
+  "extensions": [
+    {
+      "id": "hello-world",
+      "name": "Hello World",
+      "publisher": "Platform9",
+      "category": "utilities",
+      "tagline": "The smallest app that follows the catalog contract.",
+      "latest": "0.1.1",
+      "versions": [
+        {
+          "version": "0.1.1",
+          "manifest": "manifests/hello-world/0.1.1.json",
+          "sha256": "b07a58b8eedf30dc714119b108e5a54334745d52e75c2675f8875bec3a2befac",
+          "published": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "pcd-netdirector",
+      "name": "PCD Network Director",
+      "publisher": "Platform9",
+      "category": "networking",
+      "tagline": "Per-tenant gateways with firewall, NAT and VPN.",
+      "latest": "0.6.1",
+      "versions": [
+        {
+          "version": "0.6.1",
+          "manifest": "manifests/pcd-netdirector/0.6.1.json",
+          "sha256": "19ec4496918b4df367736288714608bd4cdf0bc8ba2a3ac7ddaa30be1f587ad6",
+          "published": "2026-10-21"
+        }
+      ]
+    },
+    {
+      "id": "pcd-ops",
+      "name": "PCD Ops",
+      "publisher": "Platform9",
+      "category": "operations",
+      "tagline": "Reclamation, right-sizing and capacity planning.",
+      "latest": "0.4.3",
+      "versions": [
+        {
+          "version": "0.4.3",
+          "manifest": "manifests/pcd-ops/0.4.3.json",
+          "sha256": "1f8d896150013eb8007250c5583a2439ccdf99977b427a9ea309495c2c4fccab",
+          "published": "2026-10-21"
+        }
+      ]
+    },
+    {
+      "id": "vjailbreak",
+      "name": "vJailbreak",
+      "publisher": "Platform9",
+      "category": "migration",
+      "tagline": "Migrate VMware workloads into PCD.",
+      "latest": "0.5.0",
+      "versions": [
+        {
+          "version": "0.5.0",
+          "manifest": "manifests/vjailbreak/0.5.0.json",
+          "sha256": "e9c41dd666b998febbf7d4fce0cf0d125e608f8a16b2b62b5153134c6f426b36",
+          "published": "2026-09-29"
+        }
+      ]
+    }
+  ]
+}

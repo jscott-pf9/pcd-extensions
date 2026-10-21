@@ -1,0 +1,139 @@
+{
+  "schema_version": "0.2",
+  "id": "vjailbreak",
+  "name": "vJailbreak",
+  "version": "0.5.0",
+  "publisher": "Platform9",
+  "repo": "https://github.com/platform9/vjailbreak",
+  "tagline": "Migrate VMware workloads into PCD.",
+  "description": "A migration appliance that copies virtual machines from VMware vCenter into Private Cloud Director: discovery, network and storage mapping, and cold or accelerated disk copy, driven from a web UI.",
+  "category": "migration",
+  "tags": [
+    "Migration",
+    "VMware"
+  ],
+  "featured": true,
+  "icon": "vjailbreak.svg",
+  "includes": [
+    "vCenter discovery and VM selection",
+    "Network and storage mapping",
+    "Cold and accelerated disk copy"
+  ],
+  "image": {
+    "format": "qcow2",
+    "source": {
+      "type": "oci",
+      "reference": "quay.io/platform9/vjailbreak:v0.5.0",
+      "file": "vjailbreak_qcow2/vjailbreak-image.qcow2"
+    },
+    "min_disk_gb": 60,
+    "properties": {
+      "os_type": "linux",
+      "hw_disk_bus": "virtio"
+    }
+  },
+  "requirements": {
+    "vcpus": 8,
+    "memory_mb": 16384,
+    "disk_gb": 60,
+    "root_disk": "volume"
+  },
+  "network": {
+    "port_security": true,
+    "floating_ip": "optional",
+    "addressing": [
+      "dhcp",
+      "static"
+    ],
+    "layer2": true
+  },
+  "ports": [
+    {
+      "protocol": "tcp",
+      "port": 80,
+      "purpose": "Web UI"
+    },
+    {
+      "protocol": "tcp",
+      "port": 443,
+      "purpose": "Web UI (TLS)"
+    },
+    {
+      "protocol": "tcp",
+      "port": 22,
+      "purpose": "SSH"
+    },
+    {
+      "protocol": "icmp",
+      "purpose": "Connectivity checks"
+    }
+  ],
+  "configuration": [
+    {
+      "id": "vcenter_fqdn",
+      "label": "vCenter FQDN",
+      "type": "hostname",
+      "section": "settings",
+      "placeholder": "vcenter.example.com",
+      "help": "Added to /etc/hosts with the IP."
+    },
+    {
+      "id": "vcenter_ip",
+      "label": "vCenter IP",
+      "type": "ipv4",
+      "section": "settings",
+      "placeholder": "192.168.1.100",
+      "help": "Optional; needed with the FQDN."
+    },
+    {
+      "id": "pcd_fqdn",
+      "label": "PCD FQDN",
+      "type": "hostname",
+      "section": "settings",
+      "default_from": "pcd.fqdn",
+      "help": "Defaults to this region's endpoint."
+    },
+    {
+      "id": "pcd_ip",
+      "label": "PCD IP",
+      "type": "ipv4",
+      "section": "settings",
+      "default_from": "pcd.ip",
+      "help": "Resolved from the PCD FQDN."
+    },
+    {
+      "id": "admin_password",
+      "label": "Admin Password",
+      "type": "password",
+      "section": "settings",
+      "required": true,
+      "pattern": "^.{8,}$",
+      "help": "For the ubuntu user (console and SSH); at least 8 characters."
+    }
+  ],
+  "cloud_init": {
+    "template": "#cloud-config\npassword: {{ admin_password | yaml }}\nchpasswd: { expire: False }\nssh_pwauth: True\n{% if net.mode == 'static' %}\n\nbootcmd:\n  - ip addr add {{ net.ip }}/{{ net.prefix }} dev ens3\n  - ip link set ens3 up\n{% if net.gateway %}\n  - ip route add default via {{ net.gateway }}\n{% endif %}\n{% endif %}\n\nwrite_files:\n{% if net.mode == 'static' %}\n  - path: /etc/netplan/99-static.yaml\n    permissions: '0600'\n    content: |\n      network:\n        version: 2\n        ethernets:\n          ens3:\n            addresses:\n              - {{ net.ip }}/{{ net.prefix }}\n{% if net.gateway %}\n            routes:\n              - to: default\n                via: {{ net.gateway }}\n{% endif %}\n            nameservers:\n              addresses: {{ net.dns | yaml }}\n              search: {{ net.search | yaml }}\n{% endif %}\n  - path: /etc/hosts\n    append: true\n    content: |\n      # VMware endpoints\n{% if vcenter_ip and vcenter_fqdn %}\n      {{ vcenter_ip }} {{ vcenter_fqdn }}\n{% endif %}\n      # OpenStack / PCD endpoints\n{% if pcd_ip and pcd_fqdn %}\n      {{ pcd_ip }} {{ pcd_fqdn }}\n{% endif %}\n{% if net.mode == 'static' %}\n\nruncmd:\n  - netplan apply\n{% endif %}\n"
+  },
+  "health_check": {
+    "type": "tcp",
+    "port": 80,
+    "timeout_s": 900
+  },
+  "access": {
+    "url": "http://{ip}/"
+  },
+  "ui": {
+    "nav": {
+      "label": "vJailbreak",
+      "audience": "admin",
+      "icon": "terminal"
+    }
+  },
+  "post_deploy_notes": "Open the UI and enter vCenter and PCD credentials. The VM's network must reach vCenter, the ESXi hosts and the PCD API endpoints.",
+  "todo": [
+    "Sizing is m1.xlarge-class per the docs; disk size (60 GB) and UI port (80) need confirming.",
+    "Add a health endpoint.",
+    "Static addressing assumes the interface is ens3 (default i440fx machine type); net.mac is available if that changes.",
+    "Must boot from volume (a *.vol flavor) so it can attach more volumes during migrations."
+  ]
+}

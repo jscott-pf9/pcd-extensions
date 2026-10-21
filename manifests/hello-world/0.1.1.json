@@ -1,0 +1,118 @@
+{
+  "schema_version": "0.2",
+  "id": "hello-world",
+  "name": "Hello World",
+  "version": "0.1.1",
+  "publisher": "Platform9",
+  "repo": "https://github.com/jscott-pf9/pcd-app-hello-world",
+  "tagline": "The smallest app that follows the catalog contract.",
+  "description": "A demo and test appliance for the PCD App Catalog: a 94 MiB Alpine image that reads /etc/pcd-app/config.env at first boot, renders a page from it, and serves /api/health. Use it to try the catalog end to end.",
+  "category": "utilities",
+  "tags": [
+    "Demo",
+    "Test"
+  ],
+  "featured": false,
+  "icon": "hello-world.svg",
+  "includes": [
+    "Page rendered from the catalog's config.env",
+    "GET /api/health for the catalog's health check",
+    "Runs on the smallest flavor (1 vCPU / 512 MB)"
+  ],
+  "image": {
+    "format": "qcow2",
+    "source": {
+      "type": "github_release",
+      "tag": "v0.1.1",
+      "asset": "hello-world-0.1.1.qcow2",
+      "checksum": "sha256:8621b64209af57aa7982cdbe0aba567e01c07e95302964f7c0c21de97ee23d74"
+    },
+    "min_disk_gb": 1,
+    "properties": {
+      "os_type": "linux",
+      "hw_disk_bus": "virtio",
+      "hw_firmware_type": "uefi",
+      "hw_machine_type": "q35",
+      "os_secure_boot": "disabled"
+    }
+  },
+  "requirements": {
+    "vcpus": 1,
+    "memory_mb": 512,
+    "disk_gb": 1
+  },
+  "network": {
+    "port_security": true,
+    "floating_ip": "optional",
+    "addressing": [
+      "dhcp",
+      "static"
+    ]
+  },
+  "ports": [
+    {
+      "protocol": "tcp",
+      "port": 80,
+      "purpose": "Web page and health check"
+    }
+  ],
+  "configuration": [
+    {
+      "id": "greeting",
+      "label": "Greeting",
+      "type": "string",
+      "section": "settings",
+      "default": "Hello, world",
+      "env": "HELLO_GREETING",
+      "help": "Shown as the page heading."
+    },
+    {
+      "id": "color",
+      "label": "Color",
+      "type": "select",
+      "section": "settings",
+      "default": "blue",
+      "env": "HELLO_COLOR",
+      "options": [
+        {
+          "value": "blue",
+          "label": "Blue"
+        },
+        {
+          "value": "green",
+          "label": "Green"
+        },
+        {
+          "value": "purple",
+          "label": "Purple"
+        }
+      ]
+    },
+    {
+      "id": "show_config",
+      "label": "Show config.env on the page",
+      "type": "boolean",
+      "section": "advanced",
+      "default": true,
+      "env": "HELLO_SHOW_CONFIG",
+      "help": "Lists every key the catalog wrote, to show what an app receives."
+    }
+  ],
+  "health_check": {
+    "type": "http",
+    "port": 80,
+    "path": "/api/health",
+    "timeout_s": 300
+  },
+  "access": {
+    "url": "http://{ip}/"
+  },
+  "ui": {
+    "nav": {
+      "label": "Hello World",
+      "audience": "tenant",
+      "icon": "apps"
+    }
+  },
+  "post_deploy_notes": "Open the page: it shows the greeting and every value the catalog wrote to /etc/pcd-app/config.env."
+}

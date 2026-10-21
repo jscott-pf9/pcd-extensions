@@ -1,0 +1,863 @@
+{
+  "$defs": {
+    "Access": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "description": "Template; {ip} is replaced with the instance address.",
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "Access",
+      "type": "object"
+    },
+    "CloudInit": {
+      "additionalProperties": false,
+      "description": "Guest cloud-init, as a Jinja template rendered in a sandbox. Context: the field ids, plus\nnet.* (mode, ip, prefix, cidr, gateway, dns, search, mac, network), pcd.* (region, project_id,\nfqdn, ip, auth_url), app.* (id, version) and instance. Filter `yaml` quotes a value safely.",
+      "properties": {
+        "template": {
+          "title": "Template",
+          "type": "string"
+        }
+      },
+      "required": [
+        "template"
+      ],
+      "title": "CloudInit",
+      "type": "object"
+    },
+    "ConfigField": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]{0,40}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "string",
+            "hostname",
+            "integer",
+            "boolean",
+            "select",
+            "password",
+            "ipv4",
+            "ipv4_list",
+            "network_select",
+            "flavor_select",
+            "keypair_select",
+            "az_select"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "section": {
+          "default": "settings",
+          "description": "'settings': the Appliance Settings section. 'advanced': the collapsed Advanced section.",
+          "enum": [
+            "settings",
+            "advanced"
+          ],
+          "title": "Section",
+          "type": "string"
+        },
+        "required": {
+          "default": false,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "env": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]{0,60}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Written to /etc/pcd-app/config.env as KEY=value.",
+          "title": "Env"
+        },
+        "help": {
+          "default": "",
+          "title": "Help",
+          "type": "string"
+        },
+        "placeholder": {
+          "default": "",
+          "title": "Placeholder",
+          "type": "string"
+        },
+        "options": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Option"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Options"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max"
+        },
+        "pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pattern"
+        },
+        "show_if": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShowIf"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "default_from": {
+          "anyOf": [
+            {
+              "enum": [
+                "pcd.fqdn",
+                "pcd.ip",
+                "pcd.region",
+                "pcd.auth_url"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Default taken from the deployment context, e.g. this PCD's FQDN.",
+          "title": "Default From"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "type"
+      ],
+      "title": "ConfigField",
+      "type": "object"
+    },
+    "GithubReleaseSource": {
+      "additionalProperties": false,
+      "description": "A release asset in the manifest's own `repo`.",
+      "properties": {
+        "type": {
+          "const": "github_release",
+          "title": "Type",
+          "type": "string"
+        },
+        "tag": {
+          "pattern": "^[\\w.+-]+$",
+          "title": "Tag",
+          "type": "string"
+        },
+        "asset": {
+          "pattern": "^[\\w.+-]+$",
+          "title": "Asset",
+          "type": "string"
+        },
+        "checksum": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Strongly recommended; the import is unverified without it.",
+          "title": "Checksum"
+        }
+      },
+      "required": [
+        "type",
+        "tag",
+        "asset"
+      ],
+      "title": "GithubReleaseSource",
+      "type": "object"
+    },
+    "HealthCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "http",
+            "https",
+            "tcp"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 1,
+          "title": "Port",
+          "type": "integer"
+        },
+        "path": {
+          "default": "/",
+          "title": "Path",
+          "type": "string"
+        },
+        "timeout_s": {
+          "default": 600,
+          "maximum": 3600,
+          "minimum": 30,
+          "title": "Timeout S",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type",
+        "port"
+      ],
+      "title": "HealthCheck",
+      "type": "object"
+    },
+    "Image": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "qcow2",
+          "default": "qcow2",
+          "title": "Format",
+          "type": "string"
+        },
+        "source": {
+          "discriminator": {
+            "mapping": {
+              "github_release": "#/$defs/GithubReleaseSource",
+              "oci": "#/$defs/OciSource",
+              "url": "#/$defs/UrlSource"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/GithubReleaseSource"
+            },
+            {
+              "$ref": "#/$defs/OciSource"
+            },
+            {
+              "$ref": "#/$defs/UrlSource"
+            }
+          ],
+          "title": "Source"
+        },
+        "min_disk_gb": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Min Disk Gb",
+          "type": "integer"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Glance image properties, e.g. hw_firmware_type.",
+          "title": "Properties"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "Image",
+      "type": "object"
+    },
+    "NavEntry": {
+      "additionalProperties": false,
+      "description": "A sidebar entry the PCD shell shows for each installed instance of this extension. It links\nto the instance's access URL (`access.url` with its IP), optionally plus a relative `path`.",
+      "properties": {
+        "label": {
+          "maxLength": 24,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "path": {
+          "default": "",
+          "description": "Relative to the instance's access URL; '' = the access URL itself.",
+          "maxLength": 120,
+          "title": "Path",
+          "type": "string"
+        },
+        "audience": {
+          "description": "Who the entry is for. Shown in the UI; not enforced yet.",
+          "enum": [
+            "tenant",
+            "admin"
+          ],
+          "title": "Audience",
+          "type": "string"
+        },
+        "icon": {
+          "default": "cube",
+          "enum": [
+            "apps",
+            "grid",
+            "terminal",
+            "chart",
+            "network",
+            "monitor",
+            "cube"
+          ],
+          "title": "Icon",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "audience"
+      ],
+      "title": "NavEntry",
+      "type": "object"
+    },
+    "Network": {
+      "additionalProperties": false,
+      "properties": {
+        "port_security": {
+          "default": true,
+          "title": "Port Security",
+          "type": "boolean"
+        },
+        "floating_ip": {
+          "default": "optional",
+          "enum": [
+            "optional",
+            "never",
+            "required"
+          ],
+          "title": "Floating Ip",
+          "type": "string"
+        },
+        "addressing": {
+          "description": "Addressing modes the install form offers; the first is the default. With 'static' the catalog pins the port to the chosen IP and exposes it to the cloud-init template as net.*",
+          "items": {
+            "enum": [
+              "dhcp",
+              "static"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Addressing",
+          "type": "array"
+        },
+        "layer2": {
+          "default": false,
+          "description": "The app sets its own IP from net.* in its cloud-init template, so it can be installed on PCD Layer 2 networks (no DHCP, IPAM or security groups). Needs 'static' and a template.",
+          "title": "Layer2",
+          "type": "boolean"
+        }
+      },
+      "title": "Network",
+      "type": "object"
+    },
+    "OciSource": {
+      "additionalProperties": false,
+      "description": "A qcow2 pushed to an OCI registry as an artifact (e.g. `oras push`). Must be anonymously pullable.\nThe layer digest is the checksum, so OCI sources are always verified.",
+      "properties": {
+        "type": {
+          "const": "oci",
+          "title": "Type",
+          "type": "string"
+        },
+        "reference": {
+          "description": "registry/repo:tag or registry/repo@sha256:<manifest digest>",
+          "pattern": "^[A-Za-z0-9.-]+(:\\d+)?/[a-z0-9._/-]+(:[\\w.-]+)?(@sha256:[0-9a-f]{64})?$",
+          "title": "Reference",
+          "type": "string"
+        },
+        "file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Layer to use, by its org.opencontainers.image.title annotation. Needed only when the artifact has several layers.",
+          "title": "File"
+        }
+      },
+      "required": [
+        "type",
+        "reference"
+      ],
+      "title": "OciSource",
+      "type": "object"
+    },
+    "Option": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "Option",
+      "type": "object"
+    },
+    "Port": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol": {
+          "default": "tcp",
+          "enum": [
+            "tcp",
+            "udp",
+            "icmp"
+          ],
+          "title": "Protocol",
+          "type": "string"
+        },
+        "port": {
+          "anyOf": [
+            {
+              "maximum": 65535,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Omit for icmp.",
+          "title": "Port"
+        },
+        "port_max": {
+          "anyOf": [
+            {
+              "maximum": 65535,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "End of a port range.",
+          "title": "Port Max"
+        },
+        "purpose": {
+          "title": "Purpose",
+          "type": "string"
+        },
+        "cidr": {
+          "default": "0.0.0.0/0",
+          "title": "Cidr",
+          "type": "string"
+        }
+      },
+      "required": [
+        "purpose"
+      ],
+      "title": "Port",
+      "type": "object"
+    },
+    "Requirements": {
+      "additionalProperties": false,
+      "properties": {
+        "vcpus": {
+          "minimum": 1,
+          "title": "Vcpus",
+          "type": "integer"
+        },
+        "memory_mb": {
+          "minimum": 256,
+          "title": "Memory Mb",
+          "type": "integer"
+        },
+        "disk_gb": {
+          "minimum": 1,
+          "title": "Disk Gb",
+          "type": "integer"
+        },
+        "root_disk": {
+          "default": "any",
+          "description": "'volume': only boot-from-volume flavors (0 GB local disk, e.g. *.vol), for appliances that must attach more volumes (vJailbreak). 'local': only flavors with a local disk.",
+          "enum": [
+            "any",
+            "volume",
+            "local"
+          ],
+          "title": "Root Disk",
+          "type": "string"
+        }
+      },
+      "required": [
+        "vcpus",
+        "memory_mb",
+        "disk_gb"
+      ],
+      "title": "Requirements",
+      "type": "object"
+    },
+    "ShowIf": {
+      "additionalProperties": false,
+      "description": "Show (and require) a field only when another field has a given value, or when the option\nselected in another field has a given attribute (e.g. {\"field\": \"network\", \"option\": \"kind\",\n\"equals\": \"virtual\"}).",
+      "properties": {
+        "field": {
+          "pattern": "^[a-z][a-z0-9_]{0,40}$",
+          "title": "Field",
+          "type": "string"
+        },
+        "option": {
+          "anyOf": [
+            {
+              "const": "kind",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Compare this attribute of the selected option.",
+          "title": "Option"
+        },
+        "equals": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "A value, or a list meaning 'any of'.",
+          "title": "Equals"
+        }
+      },
+      "required": [
+        "field",
+        "equals"
+      ],
+      "title": "ShowIf",
+      "type": "object"
+    },
+    "UI": {
+      "additionalProperties": false,
+      "properties": {
+        "nav": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NavEntry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "UI",
+      "type": "object"
+    },
+    "UrlSource": {
+      "additionalProperties": false,
+      "description": "Escape hatch: any HTTPS URL Glance can download without credentials.",
+      "properties": {
+        "type": {
+          "const": "url",
+          "title": "Type",
+          "type": "string"
+        },
+        "url": {
+          "pattern": "^https://",
+          "title": "Url",
+          "type": "string"
+        },
+        "checksum": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checksum"
+        }
+      },
+      "required": [
+        "type",
+        "url"
+      ],
+      "title": "UrlSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{1,40}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^[0-9][0-9A-Za-z.+-]*$",
+      "title": "Version",
+      "type": "string"
+    },
+    "publisher": {
+      "title": "Publisher",
+      "type": "string"
+    },
+    "repo": {
+      "pattern": "^https://github\\.com/[^/]+/[^/]+/?$",
+      "title": "Repo",
+      "type": "string"
+    },
+    "tagline": {
+      "maxLength": 90,
+      "title": "Tagline",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "category": {
+      "enum": [
+        "migration",
+        "networking",
+        "operations",
+        "utilities"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 4,
+      "title": "Tags",
+      "type": "array"
+    },
+    "featured": {
+      "default": false,
+      "title": "Featured",
+      "type": "boolean"
+    },
+    "icon": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "SVG file name under catalog/icons/.",
+      "title": "Icon"
+    },
+    "includes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Includes",
+      "type": "array"
+    },
+    "image": {
+      "$ref": "#/$defs/Image"
+    },
+    "requirements": {
+      "$ref": "#/$defs/Requirements"
+    },
+    "network": {
+      "$ref": "#/$defs/Network"
+    },
+    "ports": {
+      "items": {
+        "$ref": "#/$defs/Port"
+      },
+      "title": "Ports",
+      "type": "array"
+    },
+    "configuration": {
+      "items": {
+        "$ref": "#/$defs/ConfigField"
+      },
+      "title": "Configuration",
+      "type": "array"
+    },
+    "cloud_init": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CloudInit"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "health_check": {
+      "$ref": "#/$defs/HealthCheck"
+    },
+    "access": {
+      "$ref": "#/$defs/Access"
+    },
+    "ui": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UI"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "What an installed instance adds to the PCD shell."
+    },
+    "post_deploy_notes": {
+      "default": "",
+      "title": "Post Deploy Notes",
+      "type": "string"
+    },
+    "todo": {
+      "description": "Draft-only: known gaps between the app and the contract.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Todo",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "version",
+    "publisher",
+    "repo",
+    "tagline",
+    "description",
+    "category",
+    "image",
+    "requirements",
+    "health_check",
+    "access"
+  ],
+  "title": "PCD App Catalog appliance manifest (draft 0.2)",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/platform9/pcd-app-catalog/catalog/schema/manifest.schema.json"
+}
