@@ -1,0 +1,104 @@
+{
+  "schema_version": "0.2",
+  "id": "pcd-netdirector",
+  "name": "PCD Network Director",
+  "version": "0.7.0",
+  "publisher": "Platform9",
+  "repo": "https://github.com/jscott-pf9/pcd-netdirector-releases",
+  "tagline": "Per-tenant gateways with firewall, NAT and VPN.",
+  "description": "A management plane for gateway appliances on PCD. Every tenant gets a hardened VyOS gateway with firewall, NAT, port forwarding and WireGuard VPN. Optional provider gateways add a shared BGP/ECMP tier for routable tenant networks.",
+  "category": "networking",
+  "tags": [
+    "PCD",
+    "Networking"
+  ],
+  "featured": true,
+  "icon": "pcd-netdirector.svg",
+  "includes": [
+    "One gateway VM per OpenStack project",
+    "Firewall, NAT, DNAT and WireGuard in one UI",
+    "Provider tier with BGP and ECMP"
+  ],
+  "image": {
+    "format": "qcow2",
+    "source": {
+      "type": "github_release",
+      "tag": "v0.7.0",
+      "asset": "pcd-netdirector-0.7.0.qcow2",
+      "checksum": "sha256:bc5d167d3b8b0ef6e6014ed10ec675fcf8a0a06758abdb828f94405b27edc971"
+    },
+    "min_disk_gb": 10,
+    "properties": {
+      "os_type": "linux",
+      "hw_disk_bus": "virtio",
+      "hw_firmware_type": "uefi",
+      "hw_machine_type": "q35",
+      "os_secure_boot": "disabled"
+    }
+  },
+  "requirements": {
+    "vcpus": 2,
+    "memory_mb": 2048,
+    "disk_gb": 10
+  },
+  "network": {
+    "port_security": true,
+    "floating_ip": "optional",
+    "addressing": [
+      "dhcp",
+      "static"
+    ]
+  },
+  "ports": [
+    {
+      "protocol": "tcp",
+      "port": 8080,
+      "purpose": "Web UI"
+    },
+    {
+      "protocol": "tcp",
+      "port": 22,
+      "purpose": "SSH (key-only, user alpine)"
+    }
+  ],
+  "configuration": [
+    {
+      "id": "wan_network",
+      "label": "Gateway WAN network",
+      "type": "network_select",
+      "section": "settings",
+      "env": "ND_WAN_NETWORK_ID",
+      "help": "Uplink for tenant gateways; port security must be off."
+    },
+    {
+      "id": "mgmt_cidr",
+      "label": "Gateway management CIDR",
+      "type": "string",
+      "section": "settings",
+      "default": "192.168.100.0/24",
+      "env": "ND_MGMT_CIDR",
+      "pattern": "^\\d{1,3}(\\.\\d{1,3}){3}/\\d{1,2}$",
+      "help": "Subnet for gw-mgmt-net, created by Network Director."
+    }
+  ],
+  "health_check": {
+    "type": "http",
+    "port": 8080,
+    "path": "/api/health",
+    "timeout_s": 600
+  },
+  "access": {
+    "url": "http://{ip}:8080/"
+  },
+  "ui": {
+    "nav": {
+      "label": "Network Director",
+      "audience": "admin",
+      "icon": "network"
+    }
+  },
+  "post_deploy_notes": "Open the URL and log in with your PCD account (admin role in the install project). The first admin to log in authorizes background access; no PCD password is stored. SSH is key-only as user alpine.",
+  "todo": [
+    "Move repo to github.com/platform9."
+  ]
+}
