@@ -1,0 +1,96 @@
+{
+  "schema_version": "0.2",
+  "id": "pcd-netdirector",
+  "name": "PCD Network Director",
+  "version": "0.8.0",
+  "publisher": "Platform9",
+  "repo": "https://github.com/jscott-pf9/pcd-netdirector-releases",
+  "tagline": "Per-tenant gateways with firewall, NAT and VPN.",
+  "description": "A management plane for gateway appliances on PCD. Every tenant gets a hardened VyOS gateway with firewall, NAT, port forwarding and WireGuard VPN. Optional provider gateways add a shared BGP/ECMP tier for routable tenant networks.",
+  "category": "networking",
+  "tags": [
+    "PCD",
+    "Networking"
+  ],
+  "featured": true,
+  "icon": "pcd-netdirector.svg",
+  "includes": [
+    "One gateway VM per OpenStack project",
+    "Firewall, NAT, DNAT and WireGuard in one UI",
+    "Provider tier with BGP and ECMP"
+  ],
+  "image": {
+    "format": "qcow2",
+    "source": {
+      "type": "github_release",
+      "tag": "v0.8.0",
+      "asset": "pcd-netdirector-0.8.0.qcow2",
+      "checksum": "sha256:a69d612bda9b8aac1927b071816c3be15bfbca9c8f90c91b184aba96dbee6e26"
+    },
+    "min_disk_gb": 10,
+    "properties": {
+      "os_type": "linux",
+      "hw_disk_bus": "virtio",
+      "hw_firmware_type": "uefi",
+      "hw_machine_type": "q35",
+      "os_secure_boot": "disabled"
+    }
+  },
+  "requirements": {
+    "vcpus": 2,
+    "memory_mb": 2048,
+    "disk_gb": 10
+  },
+  "network": {
+    "port_security": true,
+    "floating_ip": "optional",
+    "addressing": [
+      "dhcp",
+      "static"
+    ]
+  },
+  "ports": [
+    {
+      "protocol": "tcp",
+      "port": 8080,
+      "purpose": "Web UI"
+    },
+    {
+      "protocol": "tcp",
+      "port": 22,
+      "purpose": "SSH (key-only, user alpine)"
+    }
+  ],
+  "configuration": [
+    {
+      "id": "ghcr_token",
+      "label": "Update access token (optional)",
+      "type": "password",
+      "section": "advanced",
+      "help": "GitHub fine-grained PAT with read:packages on the Network Director image. Lets the appliance check for and install updates (Settings \u203a Updates). You can also set it there later."
+    }
+  ],
+  "health_check": {
+    "type": "http",
+    "port": 8080,
+    "path": "/api/health",
+    "timeout_s": 600
+  },
+  "access": {
+    "url": "http://{ip}:8080/"
+  },
+  "ui": {
+    "nav": {
+      "label": "Network Director",
+      "audience": "admin",
+      "icon": "network"
+    }
+  },
+  "post_deploy_notes": "Open the URL and log in with your PCD account (admin role in the install project). Setup checks the prerequisites (gateway project, WAN network, management range), can create the gateway project, attaches the appliance's management NIC and authorizes background access. No PCD password is stored. SSH is key-only as user alpine.",
+  "todo": [
+    "Move repo to github.com/platform9."
+  ],
+  "cloud_init": {
+    "template": "#cloud-config\nwrite_files:\n{% if ghcr_token %}\n  - path: /var/lib/pcd-netdirector/upgrade/ghcr-token\n    owner: alpine:alpine\n    permissions: '0600'\n    content: {{ ghcr_token | yaml }}\n{% else %}\n  []\n{% endif %}\n"
+  }
+}
