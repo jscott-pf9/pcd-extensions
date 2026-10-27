@@ -5,8 +5,9 @@
 
 Copies the manifest verbatim to manifests/<id>/<version>.json and updates index.json:
 the entry's version list (newest first), its sha256, and `latest`. Top-level `categories` is
-kept as is; the manifest's category must already be listed there. A published version is
-immutable: re-adding identical bytes is a no-op; different bytes for an existing version fail.
+kept as is; the manifest's category must already be listed there. Re-adding identical bytes
+is a no-op. Different bytes for an existing version replace it while MANIFESTS_LOCKED is False
+(keeping its published date unless --published is given) and fail once it is True.
 Commit the result and open a PR; CI (tools/validate.py) checks it.
 """
 from __future__ import annotations
@@ -19,13 +20,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from indexlib import load_index, manifest_path, save_index, sha256_file, version_key  # noqa: E402
+from indexlib import MANIFESTS_LOCKED, load_index, manifest_path, save_index, sha256_file, version_key  # noqa: E402
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("manifest", type=Path)
-    ap.add_argument("--published", default=dt.date.today().isoformat(), help="release date (default: today)")
+    ap.add_argument("--published", help="release date (default: today, or the existing date when replacing)")
     args = ap.parse_args()
 
     data = json.loads(args.manifest.read_text())
@@ -36,13 +37,16 @@ def main() -> int:
               file=sys.stderr)
         return 1
     dest = manifest_path(app_id, version)
+    replacing = False
     if dest.exists():
-        if dest.read_bytes() != args.manifest.read_bytes():
+        if dest.read_bytes() == args.manifest.read_bytes():
+            print(f"{app_id} {version} already in the index (identical); nothing to do")
+            return 0
+        if MANIFESTS_LOCKED:
             print(f"error: {app_id} {version} is already published with different content; "
                   "publish a new version instead", file=sys.stderr)
             return 1
-        print(f"{app_id} {version} already in the index (identical); nothing to do")
-        return 0
+        replacing = True
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(args.manifest, dest)
 
@@ -50,8 +54,12 @@ def main() -> int:
     if entry is None:
         entry = {"id": app_id, "versions": []}
         index["extensions"].append(entry)
+    old = next((v for v in entry["versions"] if v["version"] == version), None)
+    if old is not None:
+        entry["versions"].remove(old)
+    published = args.published or (old["published"] if old else dt.date.today().isoformat())
     entry["versions"].append({"version": version, "manifest": f"manifests/{app_id}/{version}.json",
-                              "sha256": sha256_file(dest), "published": args.published})
+                              "sha256": sha256_file(dest), "published": published})
     entry["versions"].sort(key=lambda v: version_key(v["version"]), reverse=True)
     entry["latest"] = entry["versions"][0]["version"]
     latest = json.loads(manifest_path(app_id, entry["latest"]).read_text())
@@ -62,7 +70,7 @@ def main() -> int:
          for e in index["extensions"]), key=lambda e: e["id"])
     index["updated"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     save_index(index)
-    print(f"added {app_id} {version} (latest: {entry['latest']})")
+    print(f"{'replaced' if replacing else 'added'} {app_id} {version} (latest: {entry['latest']})")
     return 0
 
 

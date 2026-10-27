@@ -22,9 +22,9 @@
   "image": {
     "format": "qcow2",
     "source": {
-      "type": "oci",
-      "reference": "quay.io/platform9/vjailbreak:v0.5.0",
-      "file": "vjailbreak_qcow2/vjailbreak-image.qcow2"
+      "type": "url",
+      "url": "https://vjailbreak.s3.us-west-2.amazonaws.com/releases/v0.5.0/vjailbreak.qcow2",
+      "checksum": "sha256:6dcd9e2d1838074ee971eec70553d1825d5f008915e6b589598b5c5522808ee9"
     },
     "min_disk_gb": 60,
     "properties": {

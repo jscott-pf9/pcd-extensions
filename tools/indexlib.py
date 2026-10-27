@@ -11,6 +11,10 @@ INDEX = ROOT / "index.json"
 MANIFESTS = ROOT / "manifests"
 SCHEMA = ROOT / "schema" / "manifest.schema.json"
 INDEX_SCHEMA_VERSION = "1"
+# False while the manifest schema is still in development: a published version may be replaced
+# (add_release.py re-publishes it; validate.py --base reports the change instead of failing).
+# Set True once the schema is locked, and published versions become immutable.
+MANIFESTS_LOCKED = False
 
 
 def version_key(v: str) -> tuple:

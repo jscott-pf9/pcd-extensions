@@ -32,7 +32,7 @@ tools/validate.py               the checks CI runs on every PR and push
 ## Rules
 
 - **One entry per release.** Each version's manifest is a verbatim copy of the `manifest.json` attached to that release.
-- **Published versions are immutable.** To fix something, release a new version. CI rejects any change to an existing file under `manifests/`.
+- **Published versions become immutable once the schema is locked.** During development a published manifest can be corrected in place with `tools/add_release.py`, and CI reports the change without failing. After `MANIFESTS_LOCKED` is set in `tools/indexlib.py`, fixes need a new version, and CI rejects any change to an existing file under `manifests/`. See [CONTRIBUTING.md](CONTRIBUTING.md#changing-a-published-version).
 - **No secrets, no code.** Only manifests. Images and icons stay in the repo the manifest names as `repo`. That repo must be public, but it can be a releases-only repo, so the source repo can stay private.
 - **Merging is the approval.** An extension appears in PCD only once its PR is merged to `main`.
 

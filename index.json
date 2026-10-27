@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "name": "Platform9 PCD extensions",
-  "updated": "2026-10-21T23:54:17Z",
+  "updated": "2026-10-27T22:13:58Z",
   "categories": [
     {
       "id": "migration",
@@ -102,7 +102,7 @@
         {
           "version": "0.5.0",
           "manifest": "manifests/vjailbreak/0.5.0.json",
-          "sha256": "e9c41dd666b998febbf7d4fce0cf0d125e608f8a16b2b62b5153134c6f426b36",
+          "sha256": "d364201b8f55e4482ff848aa324d3978db4a133e6a68f6579a03f7c808d7aa13",
           "published": "2026-09-29"
         }
       ]
