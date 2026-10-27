@@ -5,9 +5,11 @@
 
 Checks
   - index.json shape; ids unique; versions unique and newest-first; latest = highest version
+  - categories: ids unique and non-empty, labels non-empty; every extension's category is listed
   - every listed manifest exists, its sha256 matches, its id/version match the entry and the path
   - every manifest validates against schema/manifest.schema.json (structure; the catalog's
     pydantic validator adds semantic rules and runs before submission and on load)
+  - a manifest's icon is a relative .svg path inside its repo (no leading "/", no "..")
   - no manifest file is left out of the index
   - with --base: no manifest that exists at <git-ref> has changed (published versions are immutable)
 """
@@ -37,11 +39,23 @@ def check(base: str | None) -> list[str]:
         errors.append(f"index.json schema_version must be {INDEX_SCHEMA_VERSION!r}")
     validator = jsonschema.Draft202012Validator(json.loads(SCHEMA.read_text()))
     listed: set[Path] = set()
+    cat_ids = [c.get("id") for c in index.get("categories") or []]
+    if not cat_ids:
+        errors.append("index.json has no categories")
+    for c in index.get("categories") or []:
+        if not c.get("id"):
+            errors.append(f"category {c!r} has no id")
+        elif not c.get("label"):
+            errors.append(f"category {c['id']!r} has no label")
+    for dup in {i for i in cat_ids if cat_ids.count(i) > 1}:
+        errors.append(f"category {dup!r} is listed more than once")
     ids = [e.get("id") for e in index.get("extensions", [])]
     for dup in {i for i in ids if ids.count(i) > 1}:
         errors.append(f"extension {dup!r} is listed more than once")
     for entry in index.get("extensions", []):
         app_id = entry.get("id", "?")
+        if entry.get("category") not in cat_ids:
+            errors.append(f"{app_id}: category {entry.get('category')!r} is not in index.json categories")
         versions = entry.get("versions") or []
         if not versions:
             errors.append(f"{app_id}: no versions")
@@ -72,6 +86,10 @@ def check(base: str | None) -> list[str]:
                 continue
             if (data.get("id"), data.get("version")) != (app_id, v.get("version")):
                 errors.append(f"{rel}: id/version {data.get('id')}/{data.get('version')} don't match the index entry")
+            icon = data.get("icon")
+            if icon is not None and (not isinstance(icon, str) or icon.startswith("/")
+                                     or ".." in icon.split("/") or not icon.endswith(".svg")):
+                errors.append(f"{rel}: icon {icon!r} must be a relative .svg path inside the repo")
             for err in sorted(validator.iter_errors(data), key=lambda e: list(e.path)):
                 loc = ".".join(str(p) for p in err.path) or "(manifest)"
                 errors.append(f"{rel}: {loc}: {err.message}")

@@ -29,4 +29,8 @@ Normally this is the last step of the extension's own `build/release.sh`, and yo
 
 ## The standard
 
+**Icon.** Set the manifest's `icon` to the path of an SVG in the manifest's `repo`, relative to the repo root (for example `assets/icon.svg`). Commit the file there and make sure it is in the tagged release. Use a square `viewBox`. PCD fetches it at the release tag (`image.source.tag`, or `v<version>`) and falls back to the default branch. `tools/validate.py` rejects a path that starts with `/`, contains `..` or doesn't end in `.svg`.
+
+**Category.** The manifest's `category` must be one of the `categories` ids in `index.json`. To add a category, add it to that list (array order is display order) in the same PR.
+
 The full set of rules an extension follows (image, `manifest.json`, `config.env`, health endpoint, authentication, releases) is in `APPLIANCE_STANDARD.md`. That file is kept in the projects workspace (`/home/jeff/platform9/projects/APPLIANCE_STANDARD.md`), and the manifest schema detail is in the catalog's `docs/MANIFEST_SPEC.md`.

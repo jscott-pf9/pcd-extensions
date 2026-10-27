@@ -765,7 +765,7 @@
         }
       ],
       "default": null,
-      "description": "SVG file name under catalog/icons/.",
+      "description": "Path to a square SVG in the manifest's repo, relative to the repo root (e.g. \"assets/icon.svg\"). Fetched from raw.githubusercontent.com at the release tag, falling back to the default branch.",
       "title": "Icon"
     },
     "includes": {

@@ -2,6 +2,28 @@
   "schema_version": "1",
   "name": "Platform9 PCD extensions",
   "updated": "2026-10-21T23:54:17Z",
+  "categories": [
+    {
+      "id": "migration",
+      "label": "Migration",
+      "description": "Move workloads into PCD."
+    },
+    {
+      "id": "networking",
+      "label": "Networking & Security",
+      "description": "Network and security tools."
+    },
+    {
+      "id": "operations",
+      "label": "Operations & Analytics",
+      "description": "Monitoring, reporting and management."
+    },
+    {
+      "id": "utilities",
+      "label": "Utility & Tools",
+      "description": "General purpose utilities and tools."
+    }
+  ],
   "extensions": [
     {
       "id": "hello-world",

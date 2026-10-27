@@ -29,7 +29,7 @@ def manifest_path(app_id: str, version: str) -> Path:
 
 def load_index() -> dict:
     if not INDEX.exists():
-        return {"schema_version": INDEX_SCHEMA_VERSION, "name": "", "updated": "", "extensions": []}
+        return {"schema_version": INDEX_SCHEMA_VERSION, "name": "", "updated": "", "categories": [], "extensions": []}
     return json.loads(INDEX.read_text())
 
 

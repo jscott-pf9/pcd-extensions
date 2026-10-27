@@ -4,7 +4,8 @@
     tools/add_release.py path/to/manifest.json [--published YYYY-MM-DD]
 
 Copies the manifest verbatim to manifests/<id>/<version>.json and updates index.json:
-the entry's version list (newest first), its sha256, and `latest`. A published version is
+the entry's version list (newest first), its sha256, and `latest`. Top-level `categories` is
+kept as is; the manifest's category must already be listed there. A published version is
 immutable: re-adding identical bytes is a no-op; different bytes for an existing version fail.
 Commit the result and open a PR; CI (tools/validate.py) checks it.
 """
@@ -29,6 +30,11 @@ def main() -> int:
 
     data = json.loads(args.manifest.read_text())
     app_id, version = data["id"], data["version"]
+    index = load_index()
+    if data["category"] not in {c["id"] for c in index.get("categories", [])}:
+        print(f"error: category {data['category']!r} is not in index.json categories; add it there first",
+              file=sys.stderr)
+        return 1
     dest = manifest_path(app_id, version)
     if dest.exists():
         if dest.read_bytes() != args.manifest.read_bytes():
@@ -40,7 +46,6 @@ def main() -> int:
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(args.manifest, dest)
 
-    index = load_index()
     entry = next((e for e in index["extensions"] if e["id"] == app_id), None)
     if entry is None:
         entry = {"id": app_id, "versions": []}
