@@ -239,6 +239,20 @@
           "default": null,
           "description": "Strongly recommended; the import is unverified without it.",
           "title": "Checksum"
+        },
+        "sha512": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{128}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Hex sha512 of the image. PCD's image library hashes with sha512, so with this the UI can show the image as Verified.",
+          "title": "Sha512"
         }
       },
       "required": [
@@ -683,6 +697,20 @@
           ],
           "default": null,
           "title": "Checksum"
+        },
+        "sha512": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{128}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Hex sha512 of the image. PCD's image library hashes with sha512, so with this the UI can show the image as Verified.",
+          "title": "Sha512"
         }
       },
       "required": [
@@ -780,6 +808,13 @@
     },
     "requirements": {
       "$ref": "#/$defs/Requirements"
+    },
+    "max_instances": {
+      "default": 1,
+      "minimum": 0,
+      "type": "integer",
+      "title": "Max Instances",
+      "description": "How many instances may be installed in one region, across all tenants. Default 1 (a single instance); 0 means no limit, for apps that scale out."
     },
     "network": {
       "$ref": "#/$defs/Network"

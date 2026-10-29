@@ -38,6 +38,7 @@
     "disk_gb": 60,
     "root_disk": "volume"
   },
+  "max_instances": 0,
   "network": {
     "port_security": true,
     "floating_ip": "optional",
