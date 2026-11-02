@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "name": "Platform9 PCD extensions",
-  "updated": "2026-10-28T22:16:48Z",
+  "updated": "2026-11-02T20:51:21Z",
   "categories": [
     {
       "id": "migration",
@@ -75,8 +75,14 @@
       "publisher": "Platform9",
       "category": "operations",
       "tagline": "Reclamation, right-sizing and capacity planning.",
-      "latest": "0.5.0",
+      "latest": "0.6.0",
       "versions": [
+        {
+          "version": "0.6.0",
+          "manifest": "manifests/pcd-ops/0.6.0.json",
+          "sha256": "375d628ab131cdda1437a0fde5aaea9ece94335748b67e295ba49a835fb4d505",
+          "published": "2026-11-02"
+        },
         {
           "version": "0.5.0",
           "manifest": "manifests/pcd-ops/0.5.0.json",
