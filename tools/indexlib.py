@@ -11,6 +11,10 @@ INDEX = ROOT / "index.json"
 MANIFESTS = ROOT / "manifests"
 SCHEMA = ROOT / "schema" / "manifest.schema.json"
 INDEX_SCHEMA_VERSION = "1"
+# Who supports an extension: set by Platform9 in index.json, never taken from a manifest
+# (a manifest is the publisher's own file). New extensions start as community.
+SUPPORT_LEVELS = ("platform9", "partner", "community")
+DEFAULT_SUPPORT = "community"
 # False while the manifest schema is still in development: a published version may be replaced
 # (add_release.py re-publishes it; validate.py --base reports the change instead of failing).
 # Set True once the schema is locked, and published versions become immutable.

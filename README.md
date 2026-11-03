@@ -13,7 +13,7 @@ The index of extensions that Platform9 Private Cloud Director can install. PCD's
 
 ```
 index.json                      categories: id, label, description, in display order
-                                every extension: id, name, publisher, category, tagline, latest,
+                                every extension: id, name, publisher, support, category, tagline, latest,
                                 and its versions (manifest path, sha256, published date), newest first
 manifests/<id>/<version>.json   a verbatim copy of that release's manifest.json
 schema/manifest.schema.json     the manifest schema (draft 0.2), from the catalog

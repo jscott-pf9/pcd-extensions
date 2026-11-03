@@ -6,6 +6,7 @@
 Checks
   - index.json shape; ids unique; versions unique and newest-first; latest = highest version
   - categories: ids unique and non-empty, labels non-empty; every extension's category is listed
+  - every extension's support is platform9, partner or community
   - every listed manifest exists, its sha256 matches, its id/version match the entry and the path
   - every manifest validates against schema/manifest.schema.json (structure; the catalog's
     pydantic validator adds semantic rules and runs before submission and on load)
@@ -24,7 +25,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from indexlib import INDEX, INDEX_SCHEMA_VERSION, MANIFESTS, MANIFESTS_LOCKED, ROOT, SCHEMA, load_index, sha256_file, version_key  # noqa: E402
+from indexlib import INDEX, INDEX_SCHEMA_VERSION, MANIFESTS, MANIFESTS_LOCKED, ROOT, SCHEMA, SUPPORT_LEVELS, load_index, sha256_file, version_key  # noqa: E402
 
 try:
     import jsonschema
@@ -59,6 +60,8 @@ def check(base: str | None) -> tuple[list[str], list[str]]:
         app_id = entry.get("id", "?")
         if entry.get("category") not in cat_ids:
             errors.append(f"{app_id}: category {entry.get('category')!r} is not in index.json categories")
+        if entry.get("support") not in SUPPORT_LEVELS:
+            errors.append(f"{app_id}: support {entry.get('support')!r} must be one of {', '.join(SUPPORT_LEVELS)}")
         versions = entry.get("versions") or []
         if not versions:
             errors.append(f"{app_id}: no versions")

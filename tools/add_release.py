@@ -5,7 +5,8 @@
 
 Copies the manifest verbatim to manifests/<id>/<version>.json and updates index.json:
 the entry's version list (newest first), its sha256, and `latest`. Top-level `categories` is
-kept as is; the manifest's category must already be listed there. Re-adding identical bytes
+kept as is; the manifest's category must already be listed there. The entry's `support` level
+is kept (a new extension starts as "community"); change it by editing index.json. Re-adding identical bytes
 is a no-op. Different bytes for an existing version replace it while MANIFESTS_LOCKED is False
 (keeping its published date unless --published is given) and fail once it is True.
 Commit the result and open a PR; CI (tools/validate.py) checks it.
@@ -20,7 +21,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from indexlib import MANIFESTS_LOCKED, load_index, manifest_path, save_index, sha256_file, version_key  # noqa: E402
+from indexlib import DEFAULT_SUPPORT, MANIFESTS_LOCKED, load_index, manifest_path, save_index, sha256_file, version_key  # noqa: E402
 
 
 def main() -> int:
@@ -52,7 +53,7 @@ def main() -> int:
 
     entry = next((e for e in index["extensions"] if e["id"] == app_id), None)
     if entry is None:
-        entry = {"id": app_id, "versions": []}
+        entry = {"id": app_id, "support": DEFAULT_SUPPORT, "versions": []}
         index["extensions"].append(entry)
     old = next((v for v in entry["versions"] if v["version"] == version), None)
     if old is not None:
@@ -66,7 +67,8 @@ def main() -> int:
     for key in ("name", "publisher", "category", "tagline"):  # listing fields follow the latest version
         entry[key] = latest[key]
     index["extensions"] = sorted(
-        ({k: e[k] for k in ("id", "name", "publisher", "category", "tagline", "latest", "versions")}
+        ({k: e.get(k, DEFAULT_SUPPORT) if k == "support" else e[k]
+          for k in ("id", "name", "publisher", "support", "category", "tagline", "latest", "versions")}
          for e in index["extensions"]), key=lambda e: e["id"])
     index["updated"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     save_index(index)
