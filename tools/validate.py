@@ -43,11 +43,17 @@ def check(base: str | None) -> tuple[list[str], list[str]]:
         errors.append(f"index.json schema_version must be {INDEX_SCHEMA_VERSION!r}")
     validator = jsonschema.Draft202012Validator(json.loads(SCHEMA.read_text()))
     listed: set[Path] = set()
-    cat_ids = [c.get("id") for c in index.get("categories") or []]
-    if not cat_ids:
+    categories = index.get("categories") or []
+    if not isinstance(categories, list):
+        errors.append("index.json categories must be a list")
+        categories = []
+    cat_ids = [c.get("id") for c in categories if isinstance(c, dict)]
+    if not categories:
         errors.append("index.json has no categories")
-    for c in index.get("categories") or []:
-        if not c.get("id"):
+    for c in categories:
+        if not isinstance(c, dict):
+            errors.append(f"category {c!r} must be an object")
+        elif not c.get("id"):
             errors.append(f"category {c!r} has no id")
         elif not c.get("label"):
             errors.append(f"category {c['id']!r} has no label")

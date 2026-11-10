@@ -33,8 +33,8 @@ def main() -> int:
     data = json.loads(args.manifest.read_text())
     app_id, version = data["id"], data["version"]
     index = load_index()
-    if data["category"] not in {c["id"] for c in index.get("categories", [])}:
-        print(f"error: category {data['category']!r} is not in index.json categories; add it there first",
+    if data.get("category") not in {c.get("id") for c in index.get("categories") or [] if isinstance(c, dict)}:
+        print(f"error: category {data.get('category')!r} is not in index.json categories; add it there first",
               file=sys.stderr)
         return 1
     dest = manifest_path(app_id, version)
