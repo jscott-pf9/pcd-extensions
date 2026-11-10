@@ -6,7 +6,7 @@ The index of extensions that Platform9 Private Cloud Director can install. PCD's
 |---|---|---|
 | Hello World | 0.1.1 | Utility & Tools |
 | PCD Network Director | 0.8.0 | Networking & Security |
-| PCD Ops | 0.6.0 | Operations & Analytics |
+| PCD Ops | 0.8.0 | Operations & Analytics |
 | vJailbreak | 0.5.0 | Migration |
 
 ## Layout
