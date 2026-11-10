@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
   "name": "Platform9 PCD extensions",
-  "updated": "2026-11-02T20:51:21Z",
+  "updated": "2026-11-10T04:58:08Z",
   "extensions": [
     {
       "id": "hello-world",
@@ -53,8 +53,14 @@
       "publisher": "Platform9",
       "category": "operations",
       "tagline": "Reclamation, right-sizing and capacity planning.",
-      "latest": "0.6.0",
+      "latest": "0.8.0",
       "versions": [
+        {
+          "version": "0.8.0",
+          "manifest": "manifests/pcd-ops/0.8.0.json",
+          "sha256": "2fb2e12f59ca89c04b650990e2f90a5e4c6d347f807f83976213a5c6444a69ff",
+          "published": "2026-11-10"
+        },
         {
           "version": "0.6.0",
           "manifest": "manifests/pcd-ops/0.6.0.json",
