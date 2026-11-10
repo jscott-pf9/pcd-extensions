@@ -11,6 +11,14 @@ INDEX = ROOT / "index.json"
 MANIFESTS = ROOT / "manifests"
 SCHEMA = ROOT / "schema" / "manifest.schema.json"
 INDEX_SCHEMA_VERSION = "1"
+# Who supports an extension: set by Platform9 in index.json, never taken from a manifest
+# (a manifest is the publisher's own file). New extensions start as community.
+SUPPORT_LEVELS = ("platform9", "partner", "community")
+DEFAULT_SUPPORT = "community"
+# False while the manifest schema is still in development: a published version may be replaced
+# (add_release.py re-publishes it; validate.py --base reports the change instead of failing).
+# Set True once the schema is locked, and published versions become immutable.
+MANIFESTS_LOCKED = False
 
 
 def version_key(v: str) -> tuple:
@@ -29,7 +37,7 @@ def manifest_path(app_id: str, version: str) -> Path:
 
 def load_index() -> dict:
     if not INDEX.exists():
-        return {"schema_version": INDEX_SCHEMA_VERSION, "name": "", "updated": "", "extensions": []}
+        return {"schema_version": INDEX_SCHEMA_VERSION, "name": "", "updated": "", "categories": [], "extensions": []}
     return json.loads(INDEX.read_text())
 
 
