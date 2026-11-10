@@ -2,11 +2,34 @@
   "schema_version": "1",
   "name": "Platform9 PCD extensions",
   "updated": "2026-11-02T20:51:21Z",
+  "categories": [
+    {
+      "id": "migration",
+      "label": "Migration",
+      "description": "Move workloads into PCD."
+    },
+    {
+      "id": "networking",
+      "label": "Networking & Security",
+      "description": "Network and security tools."
+    },
+    {
+      "id": "operations",
+      "label": "Operations & Analytics",
+      "description": "Monitoring, reporting and management."
+    },
+    {
+      "id": "utilities",
+      "label": "Utility & Tools",
+      "description": "General purpose utilities and tools."
+    }
+  ],
   "extensions": [
     {
       "id": "hello-world",
       "name": "Hello World",
       "publisher": "Platform9",
+      "support": "community",
       "category": "utilities",
       "tagline": "The smallest app that follows the catalog contract.",
       "latest": "0.1.1",
@@ -14,7 +37,7 @@
         {
           "version": "0.1.1",
           "manifest": "manifests/hello-world/0.1.1.json",
-          "sha256": "b07a58b8eedf30dc714119b108e5a54334745d52e75c2675f8875bec3a2befac",
+          "sha256": "17d93f941af829a1eaa6c42e947f8ee2e189875ad8852e4a9bd14c3628813bf6",
           "published": "2026-10-20"
         }
       ]
@@ -23,6 +46,7 @@
       "id": "pcd-netdirector",
       "name": "PCD Network Director",
       "publisher": "Platform9",
+      "support": "community",
       "category": "networking",
       "tagline": "Per-tenant gateways with firewall, NAT and VPN.",
       "latest": "0.8.0",
@@ -51,6 +75,7 @@
       "id": "pcd-ops",
       "name": "PCD Ops",
       "publisher": "Platform9",
+      "support": "community",
       "category": "operations",
       "tagline": "Reclamation, right-sizing and capacity planning.",
       "latest": "0.6.0",
@@ -79,6 +104,7 @@
       "id": "vjailbreak",
       "name": "vJailbreak",
       "publisher": "Platform9",
+      "support": "platform9",
       "category": "migration",
       "tagline": "Migrate VMware workloads into PCD.",
       "latest": "0.5.0",
@@ -86,7 +112,7 @@
         {
           "version": "0.5.0",
           "manifest": "manifests/vjailbreak/0.5.0.json",
-          "sha256": "e9c41dd666b998febbf7d4fce0cf0d125e608f8a16b2b62b5153134c6f426b36",
+          "sha256": "7a544e8efdebdc83b06039ebf628fbfa72149e23a23b9486a8176babff313d70",
           "published": "2026-09-29"
         }
       ]

@@ -25,7 +25,8 @@
       "type": "github_release",
       "tag": "v0.1.1",
       "asset": "hello-world-0.1.1.qcow2",
-      "checksum": "sha256:8621b64209af57aa7982cdbe0aba567e01c07e95302964f7c0c21de97ee23d74"
+      "checksum": "sha256:8621b64209af57aa7982cdbe0aba567e01c07e95302964f7c0c21de97ee23d74",
+      "sha512": "3dcdbdbcd82f719691ef2494632e05c89af1a7fd4196cda7de9a83e3999f52703d8e30da6c0c3341712efb5da8ad061f11cbd858e2fc455d3f720e2496e9f5f1"
     },
     "min_disk_gb": 1,
     "properties": {
@@ -41,6 +42,7 @@
     "memory_mb": 512,
     "disk_gb": 1
   },
+  "max_instances": 0,
   "network": {
     "port_security": true,
     "floating_ip": "optional",
